@@ -1,44 +1,13 @@
-# comment
-name: train-model
-on:
-  push:
-    branches:
-      - main
+name: learn-github-actions
+run-name: ${{ github.actor }} is learning GitHub Actions
+on: [push]
 jobs:
-  train-model:
+  check-bats-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Switch to heroku branch
-        shell: bash
-        run: |
-          git config --global user.email ""
-          git config --global user.name "Github Actions"
-          git pull
-          git checkout heroku
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          python-version: "3.9"
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Train model
-        run: python train.py
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: baummethoden.pickle
-          path: models/baummethoden.pickle
-      - name: Push changes to heroku branch
-        shell: bash
-        run: |
-          git add .
-          git commit -m "Update files" || echo "No changes to commit"
-          git push
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-          branch: "heroku"
+          node-version: "14"
+      - run: npm install -g bats
+      - run: bats -v
