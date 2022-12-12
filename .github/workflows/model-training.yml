@@ -1,13 +1,27 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
+name: model-training
 on: [push]
 jobs:
-  check-bats-version:
+  train-model:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+
+      - uses: actions/setup-python@v2
+        name: Setup Python
         with:
-          node-version: "14"
-      - run: npm install -g bats
-      - run: bats -v
+          python-version: "3.9"
+
+      - run: pip install -r requirements.txt
+        name: Install Requirements
+
+      - run: pytest
+        name: Run Tests
+
+      - run: python src/train.py
+        name: Train Model
+
+      - uses: actions/upload-artifact@v2
+        name: Upload Model
+        with:
+          name: model.pickle
+          path: data/models/model.pickle
